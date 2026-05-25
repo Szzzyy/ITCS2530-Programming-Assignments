@@ -7,7 +7,7 @@ int main() {
 
     std::string tcg;
     std::string favoriteCard;
-    int TimeCollected;
+    int Time;
 
     //using getline to take the string of the respone in case its longer then one word
     std::cout << "What Trading Card Game do you collect? ";
@@ -17,12 +17,12 @@ int main() {
     std::getline(std::cin, favoriteCard);
 
     std::cout << "How many years have you been collecting this Trading Card Game? ";
-    std::cin >> TimeCollected;
+    std::cin >> Time;
 
 
     //Take all the input values to create the short paragraph
 
-    std::cout << "\nYou have been collecting " << tcg << " for " << TimeCollected << " years with " << favoriteCard << " being your favorite card after all that time!";
+    std::cout << "\nYou have been collecting " << tcg << " for " << Time << " years with " << favoriteCard << " being your favorite card after all that time!";
 
     return 0;
 }
