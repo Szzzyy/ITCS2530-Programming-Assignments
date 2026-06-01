@@ -1,12 +1,12 @@
 ********************************************
         Your Collection Report              
 ********************************************
-TCG:                        Magic The Gathering
-Favorite Card:              Akroma's Will
+TCG:                        1
+Favorite Card:              1
 --------------------------------------------
-Years Collecting:           10 years
-Total Cards Owned:          100 cards
-Avg Card Value:             $5
+Years Collecting:           1 years
+Total Cards Owned:          1 cards
+Avg Card Value:             $1
 --------------------------------------------
 Total Collection Value:     $0
 Avg Cards Per Year:         1 cards/yr
