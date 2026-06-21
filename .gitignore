@@ -73,3 +73,6 @@ Release/
 *.exe
 *.obj
 *.log
+x64/
+*.vcxproj.user
+.vs/
