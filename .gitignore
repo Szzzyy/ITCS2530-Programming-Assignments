@@ -67,6 +67,7 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+<<<<<<< HEAD
 .vs/
 Debug/
 Release/
@@ -76,3 +77,21 @@ Release/
 x64/
 *.vcxproj.user
 .vs/
+=======
+
+# Visual Studio
+x64/
+x86/
+.vs/
+*.vcxproj.user
+*.suo
+*.db
+*.db-shm
+*.db-wal
+*.opendb
+*.ipch
+*.tlog
+*.lastbuildstate
+*.recipe
+*.idb
+>>>>>>> week4-programming-assignment
