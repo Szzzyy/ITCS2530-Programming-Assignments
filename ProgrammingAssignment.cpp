@@ -2,17 +2,6 @@
 #include <string>
 #include <iomanip>
 #include <fstream>
-#include <windows.h>
-
-void displayBanner();
-void setColor(int color);
-void displayMenu();
-std::string getStringInput(std::string prompt);
-int getInt(std::string prompt);
-double getDouble(std::string prompt);
-double calculateTotalValue(int totalCards, double cardValue);
-int calculateCardsPerYear(int totalCards, int years);
-void Report(std::string tcg, std::string favoriteCard, int years, int totalCards, double cardValue, double totalValue, int cardsPerYear);
 
 int main() {
 
@@ -27,13 +16,20 @@ int main() {
     int    cardsPerYear = 0;
     int    menu = 0;
 
-    displayBanner();
+    // banner for the beginning of the code to introduce the user to
+    std::cout << "********************************************\n";
+    std::cout << "       Trading Card Collection Tracker      \n";
+    std::cout << "********************************************\n\n";
 
     // do while loop that keeps on repeating the program until the user stops typing y
     char repeat = 'y';
     do {
 
-        displayMenu();
+        //Menu for the selections
+        std::cout << "1. Log My Collection\n";
+        std::cout << "2. View Sample Report\n";
+        std::cout << "3. Get Recommendation Based On Experience\n";
+        std::cout << "Enter choice: ";
 
         std::cin >> menu;
         // while loop that keeps on going until user enters a number between 1-3
@@ -46,13 +42,41 @@ int main() {
         switch (menu) {
 
             case 1:
-                tcg = getStringInput("What Trading Card Game do you collect? ");
-                favoriteCard = getStringInput("What is your favorite card? ");
-                years = getInt("How many years have you been collecting the TCG? ");
-                totalCards = getInt("How many cards do you own? ");
-                cardValue = getDouble("What is the average value of your cards? ");
-                totalValue = calculateTotalValue(totalCards, cardValue);
-                cardsPerYear = calculateCardsPerYear(totalCards, years);
+                std::cout << "What Trading Card Game do you collect? ";
+                std::getline(std::cin, tcg);
+
+                std::cout << "What is your favorite card? ";
+                std::getline(std::cin, favoriteCard);
+
+                std::cout << "How many years have you been collecting the TCG? ";
+                std::cin >> years;
+                if (std::cin.fail() || years < 0) {
+                    std::cout << "Invalid input, putting 0 years as default\n";
+                    std::cin.clear();
+                    std::cin.ignore(1000, '\n');
+                    years = 0;
+                }
+
+                std::cout << "How many cards do you own? ";
+                std::cin >> totalCards;
+                if (std::cin.fail() || totalCards < 0) {
+                    std::cout << "Invalid input, putting 0 cards as default.\n";
+                    std::cin.clear();
+                    std::cin.ignore(1000, '\n');
+                    totalCards = 0;
+                }
+
+                std::cout << "What is the average value of your cards? ";
+                std::cin >> cardValue;
+                if (std::cin.fail() || cardValue < 0) {
+                    std::cout << "Invalid input, putting average card value to 0\n";
+                    std::cin.clear();
+                    std::cin.ignore(1000, '\n');
+                    cardValue = 0;
+                }
+
+                totalValue   = totalCards * cardValue;
+                cardsPerYear = (years > 0) ? totalCards / years : totalCards;
 
                 // if/else block giving comments on the value of the user's collection
                 if (totalCards >= 500 && totalValue >= 1000) {
@@ -93,7 +117,24 @@ int main() {
                 std::cout << std::left << std::setw(28) << "Cards Per Year:"     << cardsPerYear << " cards/yr\n";
                 std::cout << "********************************************\n";
 
-                Report(tcg, favoriteCard, years, totalCards, cardValue, totalValue, cardsPerYear);
+                {
+                    std::ofstream outFile("report.txt");
+                    outFile << "********************************************\n";
+                    outFile << "           Your Collection Report           \n";
+                    outFile << "********************************************\n";
+                    outFile << std::left << std::setw(28) << "TCG:"           << tcg          << "\n";
+                    outFile << std::left << std::setw(28) << "Favorite Card:" << favoriteCard << "\n";
+                    outFile << "--------------------------------------------\n";
+                    outFile << std::left << std::setw(28) << "Years Collecting:"  << years      << " yrs\n";
+                    outFile << std::left << std::setw(28) << "Total Cards:"       << totalCards << " cards\n";
+                    outFile << std::fixed << std::setprecision(2);
+                    outFile << std::left << std::setw(28) << "Avg Card Value:"    << "$" << cardValue << "\n";
+                    outFile << "--------------------------------------------\n";
+                    outFile << std::left << std::setw(28) << "Total Value:"       << "$" << totalValue << "\n";
+                    outFile << std::left << std::setw(28) << "Cards Per Year:"    << cardsPerYear << " cards/yr\n";
+                    outFile << "********************************************\n";
+                    outFile.close();
+                }
                 std::cout << "Report saved to report.txt\n";
                 break;
 
@@ -115,8 +156,13 @@ int main() {
                 break;
 
             case 3:
-                years = getInt("\nYears collecting? ");
-                totalCards = getInt("Total cards? ");
+                std::cout << "\nYears collecting? ";
+                std::cin >> years;
+                if (std::cin.fail() || years < 0) { years = 0; }
+
+                std::cout << "Total cards? ";
+                std::cin >> totalCards;
+                if (std::cin.fail() || totalCards < 0) { totalCards = 0; }
 
                 std::cout << "\n********************************************\n";
                 std::cout << "         Collector Recommendation           \n";
@@ -148,89 +194,4 @@ int main() {
     std::cout << "\nThanks for using the Trading Card Tracker!\n";
 
     return 0;
-}
-
-void displayBanner() {
-    setColor(5);
-    std::cout << "********************************************\n";
-    std::cout << "       Trading Card Collection Tracker      \n";
-    std::cout << "********************************************\n\n";
-}
-
-// Changes the console text color
-void setColor(int color) {
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(hConsole, color);
-}
-
-void displayMenu() {
-    setColor(5);
-    std::cout << "1. Log My Collection\n";
-    std::cout << "2. View Sample Report\n";
-    std::cout << "3. Get Recommendation Based On Experience\n";
-    std::cout << "Enter choice: ";
-}
-
-std::string getStringInput(std::string prompt) {
-    std::string value;
-    std::cout << prompt;
-    std::getline(std::cin, value);
-    return value;
-}
-
-int getInt(std::string prompt) {
-    int value;
-    std::cout << prompt;
-    std::cin >> value;
-    if (std::cin.fail() || value < 0) {
-        std::cout << "Invalid input, using 0 as default\n";
-        std::cin.clear();
-        std::cin.ignore(1000, '\n');
-        value = 0;
-    }
-    return value;
-}
-
-double getDouble(std::string prompt) {
-    double value;
-    std::cout << prompt;
-    std::cin >> value;
-    if (std::cin.fail() || value < 0) {
-        std::cout << "Invalid input, using 0 as default\n";
-        std::cin.clear();
-        std::cin.ignore(1000, '\n');
-        value = 0;
-    }
-    return value;
-}
-
-double calculateTotalValue(int totalCards, double cardValue) {
-    return totalCards * cardValue;
-}
-
-int calculateCardsPerYear(int totalCards, int years) {
-    if (years > 0) {
-        return totalCards / years;
-    }
-    return totalCards;
-}
-
-// Saves the collection report to a text file
-void Report(std::string tcg, std::string favoriteCard, int years, int totalCards, double cardValue, double totalValue, int cardsPerYear) {
-    std::ofstream outFile("report.txt");
-    outFile << "********************************************\n";
-    outFile << "           Your Collection Report           \n";
-    outFile << "********************************************\n";
-    outFile << std::left << std::setw(28) << "TCG:"           << tcg          << "\n";
-    outFile << std::left << std::setw(28) << "Favorite Card:" << favoriteCard << "\n";
-    outFile << "--------------------------------------------\n";
-    outFile << std::left << std::setw(28) << "Years Collecting:"  << years      << " yrs\n";
-    outFile << std::left << std::setw(28) << "Total Cards:"       << totalCards << " cards\n";
-    outFile << std::fixed << std::setprecision(2);
-    outFile << std::left << std::setw(28) << "Avg Card Value:"    << "$" << cardValue << "\n";
-    outFile << "--------------------------------------------\n";
-    outFile << std::left << std::setw(28) << "Total Value:"       << "$" << totalValue << "\n";
-    outFile << std::left << std::setw(28) << "Cards Per Year:"    << cardsPerYear << " cards/yr\n";
-    outFile << "********************************************\n";
-    outFile.close();
 }
