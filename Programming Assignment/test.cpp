@@ -51,6 +51,7 @@ int main() {
                 years = getInt("How many years have you been collecting the TCG? ");
                 totalCards = getInt("How many cards do you own? ");
                 cardValue = getDouble("What is the average value of your cards? ");
+
                 totalValue = calculateTotalValue(totalCards, cardValue);
                 cardsPerYear = calculateCardsPerYear(totalCards, years);
 
