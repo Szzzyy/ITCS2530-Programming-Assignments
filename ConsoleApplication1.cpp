@@ -4,6 +4,13 @@
 #include <fstream>
 #include <windows.h>
 
+enum CardRarity {
+    COMMON = 1,
+    UNCOMMON,
+    RARE,
+};
+const int maxprice = 100;
+
 void displayBanner();
 void setColor(int color);
 void displayMenu();
@@ -12,7 +19,9 @@ int getInt(std::string prompt);
 double getDouble(std::string prompt);
 double calculateTotalValue(int totalCards, double cardValue);
 int calculateCardsPerYear(int totalCards, int years);
-void Report(std::string tcg, std::string favoriteCard, int years, int totalCards, double cardValue, double totalValue, int cardsPerYear);
+void Report(std::string tcg, std::string favoriteCard, int years, int totalCards, double cardValue, double totalValue, int cardsPerYear, std::string rarity); // adedc str rarity
+std::string getrarity(); //@ added for enum
+double cardavg(double price[], int& size, int maxsize);
 
 int main() {
 
@@ -27,6 +36,11 @@ int main() {
     int    cardsPerYear = 0;
     int    menu = 0;
 
+    std::string rarity; //@
+    double price[maxprice] = { 0.0 };
+    double finalavg = 0.0;
+    int actualsize = 0;
+
     displayBanner();
 
     // do while loop that keeps on repeating the program until the user stops typing y
@@ -37,8 +51,8 @@ int main() {
 
         std::cin >> menu;
         // while loop that keeps on going until user enters a number between 1-3
-        while (menu < 1 || menu > 3) {
-            std::cout << "Invalid. Enter 1, 2, or 3: ";
+        while (menu < 1 || menu > 4) {
+            std::cout << "Invalid. Enter 1, 2, 3, or 4: ";
             std::cin >> menu;
         }
         std::cin.ignore(1000, '\n');
@@ -51,6 +65,8 @@ int main() {
                 years = getInt("How many years have you been collecting the TCG? ");
                 totalCards = getInt("How many cards do you own? ");
                 cardValue = getDouble("What is the average value of your cards? ");
+
+                rarity = getrarity(); //@ call new rarity function
 
                 totalValue = calculateTotalValue(totalCards, cardValue);
                 cardsPerYear = calculateCardsPerYear(totalCards, years);
@@ -84,6 +100,7 @@ int main() {
                 std::cout << "********************************************\n";
                 std::cout << std::left << std::setw(28) << "TCG:"            << tcg          << "\n";
                 std::cout << std::left << std::setw(28) << "Favorite Card:"  << favoriteCard << "\n";
+                std::cout << std::left << std::setw(28) << "Main Rarity Tier:" << rarity << "\n"; //@ added for rarity 
                 std::cout << "--------------------------------------------\n";
                 std::cout << std::left << std::setw(28) << "Years Collecting:"   << years      << " yrs\n";
                 std::cout << std::left << std::setw(28) << "Total Cards:"        << totalCards << " cards\n";
@@ -94,7 +111,7 @@ int main() {
                 std::cout << std::left << std::setw(28) << "Cards Per Year:"     << cardsPerYear << " cards/yr\n";
                 std::cout << "********************************************\n";
 
-                Report(tcg, favoriteCard, years, totalCards, cardValue, totalValue, cardsPerYear);
+                Report(tcg, favoriteCard, years, totalCards, cardValue, totalValue, cardsPerYear, rarity);
                 std::cout << "Report saved to report.txt\n";
                 break;
 
@@ -134,6 +151,19 @@ int main() {
                 std::cout << "********************************************\n";
                 break;
 
+            case 4:
+                std::cout << "Card Price Average Tool\n";
+                finalavg = cardavg(price, actualsize, maxprice);
+
+                std::cout << "\n********************************************\n";
+                std::cout << "              Calculated Results            \n";
+                std::cout << "********************************************\n";
+                std::cout << "Total Entries:" << actualsize << "\n";
+                std::cout << std::fixed << std::setprecision(2);
+                std::cout << "Calculated Average: $" << finalavg << "\n";
+                std::cout << "\n********************************************\n";
+                break;
+
             default:
                 std::cout << "\nRun again and enter 1 2 3\n";
                 break;
@@ -169,6 +199,7 @@ void displayMenu() {
     std::cout << "1. Log My Collection\n";
     std::cout << "2. View Sample Report\n";
     std::cout << "3. Get Recommendation Based On Experience\n";
+    std::cout << "4. Average Price Calculator\n";
     std::cout << "Enter choice: ";
 }
 
@@ -217,13 +248,14 @@ int calculateCardsPerYear(int totalCards, int years) {
 }
 
 // Saves the collection report to a text file
-void Report(std::string tcg, std::string favoriteCard, int years, int totalCards, double cardValue, double totalValue, int cardsPerYear) {
+void Report(std::string tcg, std::string favoriteCard, int years, int totalCards, double cardValue, double totalValue, int cardsPerYear, std::string rarity) {
     std::ofstream outFile("report.txt");
     outFile << "********************************************\n";
     outFile << "           Your Collection Report           \n";
     outFile << "********************************************\n";
     outFile << std::left << std::setw(28) << "TCG:"           << tcg          << "\n";
     outFile << std::left << std::setw(28) << "Favorite Card:" << favoriteCard << "\n";
+    outFile << std::left << std::setw(28) << "Main Rarity Tier:" << rarity << "\n"; //@ also update this
     outFile << "--------------------------------------------\n";
     outFile << std::left << std::setw(28) << "Years Collecting:"  << years      << " yrs\n";
     outFile << std::left << std::setw(28) << "Total Cards:"       << totalCards << " cards\n";
@@ -234,4 +266,49 @@ void Report(std::string tcg, std::string favoriteCard, int years, int totalCards
     outFile << std::left << std::setw(28) << "Cards Per Year:"    << cardsPerYear << " cards/yr\n";
     outFile << "********************************************\n";
     outFile.close();
+}
+std::string getrarity() {
+    int rarechoice = 0;
+    std::cout << "Average Rarity of colleciton: 1. Common, 2. Uncommon, 3. Rare\n";
+    std::cin >> rarechoice;
+    std::cin.ignore(); // Clear the newline character from the buffer
+
+    CardRarity rarity = static_cast<CardRarity>(rarechoice);
+
+    switch (rarity) {
+        case COMMON:      return "Common";
+        case UNCOMMON:    return "Uncommon";
+        case RARE:        return "Rare"; 
+        default:          return "unkown";
+    }
+}
+double cardavg(double price[], int& size, int maxsize) {
+   
+    std::cout << "how many cards are we calculating? ";
+    std::cin >> size;
+
+    while (size <= 0 || size > maxsize) {
+        std::cout << "invalid card amoun";
+        std::cin.clear();
+        std::cin.ignore(1000, '\n');
+    }
+    for (int i = 0; i < size; i++) {
+    std::cout << "Enter price for item #" << (i + 1) << " ";
+    std::cin >> price[i];
+
+    while (std::cin.fail() || price[i] < 0) {
+        std::cout << "Invalid entrym enter positive dollar amount";
+        std::cin.clear();
+        std::cin.ignore(1000, '\n');
+        std::cin >> price[i];
+        }
+    }
+    std::cin.ignore(1000, '\n');
+
+    double temptotal = 0.0;
+    for (int j = 0; j < size; j++) {
+        temptotal += price[j];
+    }
+    return temptotal / size;
+
 }
