@@ -10,6 +10,20 @@ enum CardRarity {
     RARE,
 };
 const int maxprice = 100;
+const int Max_collections = 5; 
+
+struct CardCollection {
+    std::string tcg;
+    std::string favoriteCard;
+    int    years = 0;
+    int    totalCards = 0;
+    double cardValue = 0;
+    double totalValue = 0;
+    int    cardsPerYear = 0;
+    std::string rarity; 
+
+};
+
 
 void displayBanner();
 void setColor(int color);
@@ -19,24 +33,24 @@ int getInt(std::string prompt);
 double getDouble(std::string prompt);
 double calculateTotalValue(int totalCards, double cardValue);
 int calculateCardsPerYear(int totalCards, int years);
-void Report(std::string tcg, std::string favoriteCard, int years, int totalCards, double cardValue, double totalValue, int cardsPerYear, std::string rarity); // adedc str rarity
-std::string getrarity(); //@ added for enum
+void Report(std::string tcg, std::string favoriteCard, int years, int totalCards, double cardValue, double totalValue, int cardsPerYear, std::string rarity); 
+std::string getrarity(); 
 double cardavg(double price[], int& size, int maxsize);
 
+// all new functions using struct
+void fillcollectiondata(CardCollection& collection);
+void printcollectionsum(const CardCollection& collection);
+void savecollectionsum(const CardCollection& collecttion);
+void displaycollection(const CardCollection collections[], int size);
+
+
+
+
 int main() {
+    CardCollection myCollections[Max_collections];
+    int currentcollectioncount = 0;
 
-    // Variables
-    std::string tcg;
-    std::string favoriteCard;
-    //Just like an earlier comment, i added 0's to all the numbered variables due to diffuculties with calculations
-    int    years      = 0;
-    int    totalCards = 0;
-    double cardValue  = 0;
-    double totalValue = 0;
-    int    cardsPerYear = 0;
     int    menu = 0;
-
-    std::string rarity; //@
     double price[maxprice] = { 0.0 };
     double finalavg = 0.0;
     int actualsize = 0;
@@ -60,64 +74,19 @@ int main() {
         switch (menu) {
 
             case 1:
-                tcg = getStringInput("What Trading Card Game do you collect? ");
-                favoriteCard = getStringInput("What is your favorite card? ");
-                years = getInt("How many years have you been collecting the TCG? ");
-                totalCards = getInt("How many cards do you own? ");
-                cardValue = getDouble("What is the average value of your cards? ");
-
-                rarity = getrarity(); //@ call new rarity function
-
-                totalValue = calculateTotalValue(totalCards, cardValue);
-                cardsPerYear = calculateCardsPerYear(totalCards, years);
-
-                // if/else block giving comments on the value of the user's collection
-                if (totalCards >= 500 && totalValue >= 1000) {
-                    std::cout << "\nHuge collection with high value.\n";
-                } else if (totalCards <= 500 && totalValue >= 1000) {
-                    std::cout << "\nQaulity over qauntity\n";
-                } else {
-                    std::cout << "\nWe all start somewhere.\n";
+                if (currentcollectioncount < Max_collections) {
+                    std::cout << "\n--- Logging Collection #" << (currentcollectioncount + 1) << "---\n";
+                    fillcollectiondata(myCollections[currentcollectioncount]);
+                    currentcollectioncount++;
                 }
-
-                // if/else block giving statements regarding the collection
-                if (years >= 5 && totalCards >= 300) {
-                    std::cout << "Long term collector\n";
-                } else if (years < 5 && totalCards >= 300) {
-                    std::cout << "Fast collector\n";
-                } else {
-                    std::cout << "Slow but steady\n";
+                else {
+                    std::cout << "\nError, slots filled\n";
                 }
-
-                // for loop, adding a divider between the respones and the report
-                for (int i = 0; i < 44; i++) {
-                    std::cout << "=";
-                }
-                std::cout << "\n";
-
-                std::cout << "\n********************************************\n";
-                std::cout << "           Your Collection Report           \n";
-                std::cout << "********************************************\n";
-                std::cout << std::left << std::setw(28) << "TCG:"            << tcg          << "\n";
-                std::cout << std::left << std::setw(28) << "Favorite Card:"  << favoriteCard << "\n";
-                std::cout << std::left << std::setw(28) << "Main Rarity Tier:" << rarity << "\n"; //@ added for rarity 
-                std::cout << "--------------------------------------------\n";
-                std::cout << std::left << std::setw(28) << "Years Collecting:"   << years      << " yrs\n";
-                std::cout << std::left << std::setw(28) << "Total Cards:"        << totalCards << " cards\n";
-                std::cout << std::fixed << std::setprecision(2);
-                std::cout << std::left << std::setw(28) << "Avg Card Value:"     << "$" << cardValue  << "\n";
-                std::cout << "--------------------------------------------\n";
-                std::cout << std::left << std::setw(28) << "Total Value:"        << "$" << totalValue  << "\n";
-                std::cout << std::left << std::setw(28) << "Cards Per Year:"     << cardsPerYear << " cards/yr\n";
-                std::cout << "********************************************\n";
-
-                Report(tcg, favoriteCard, years, totalCards, cardValue, totalValue, cardsPerYear, rarity);
-                std::cout << "Report saved to report.txt\n";
                 break;
 
             case 2:
                 std::cout << "\n********************************************\n";
-                std::cout << "           Your Collection Report           \n";
+                std::cout << "                Sample Report                \n";
                 std::cout << "********************************************\n";
                 std::cout << std::left << std::setw(28) << "TCG:"           << "Magic The Gathering\n";
                 std::cout << std::left << std::setw(28) << "Favorite Card:" << "Akroma's Will\n";
@@ -133,22 +102,12 @@ int main() {
                 break;
 
             case 3:
-                years = getInt("\nYears collecting? ");
-                totalCards = getInt("Total cards? ");
-
-                std::cout << "\n********************************************\n";
-                std::cout << "         Collector Recommendation           \n";
-                std::cout << "********************************************\n";
-
-                if (years >= 5 && totalCards >= 300) {
-                    std::cout << "High level collector- Start vending at card shows\n";
-                } else if (years >= 2 && totalCards >= 50) {
-                    std::cout << "Medium Level collector- Start focusing on cards you like instead of value\n";
-                } else {
-                    std::cout << "Low level collector- pick out a TCG and start collecting\n";
+                if (currentcollectioncount == 0) {
+                    std::cout << "\nNo collection avalable\n";
                 }
-
-                std::cout << "********************************************\n";
+                else {
+                    displaycollection(myCollections, currentcollectioncount);
+                }
                 break;
 
             case 4:
@@ -181,6 +140,7 @@ int main() {
     return 0;
 }
 
+
 void displayBanner() {
     setColor(5);
     std::cout << "********************************************\n";
@@ -198,7 +158,7 @@ void displayMenu() {
     setColor(5);
     std::cout << "1. Log My Collection\n";
     std::cout << "2. View Sample Report\n";
-    std::cout << "3. Get Recommendation Based On Experience\n";
+    std::cout << "3. View Collections and Recomendations\n";
     std::cout << "4. Average Price Calculator\n";
     std::cout << "Enter choice: ";
 }
@@ -236,37 +196,6 @@ double getDouble(std::string prompt) {
     return value;
 }
 
-double calculateTotalValue(int totalCards, double cardValue) {
-    return totalCards * cardValue;
-}
-
-int calculateCardsPerYear(int totalCards, int years) {
-    if (years > 0) {
-        return totalCards / years;
-    }
-    return totalCards;
-}
-
-// Saves the collection report to a text file
-void Report(std::string tcg, std::string favoriteCard, int years, int totalCards, double cardValue, double totalValue, int cardsPerYear, std::string rarity) {
-    std::ofstream outFile("report.txt");
-    outFile << "********************************************\n";
-    outFile << "           Your Collection Report           \n";
-    outFile << "********************************************\n";
-    outFile << std::left << std::setw(28) << "TCG:"           << tcg          << "\n";
-    outFile << std::left << std::setw(28) << "Favorite Card:" << favoriteCard << "\n";
-    outFile << std::left << std::setw(28) << "Main Rarity Tier:" << rarity << "\n"; //@ also update this
-    outFile << "--------------------------------------------\n";
-    outFile << std::left << std::setw(28) << "Years Collecting:"  << years      << " yrs\n";
-    outFile << std::left << std::setw(28) << "Total Cards:"       << totalCards << " cards\n";
-    outFile << std::fixed << std::setprecision(2);
-    outFile << std::left << std::setw(28) << "Avg Card Value:"    << "$" << cardValue << "\n";
-    outFile << "--------------------------------------------\n";
-    outFile << std::left << std::setw(28) << "Total Value:"       << "$" << totalValue << "\n";
-    outFile << std::left << std::setw(28) << "Cards Per Year:"    << cardsPerYear << " cards/yr\n";
-    outFile << "********************************************\n";
-    outFile.close();
-}
 std::string getrarity() {
     int rarechoice = 0;
     std::cout << "Average Rarity of colleciton: 1. Common, 2. Uncommon, 3. Rare\n";
@@ -312,3 +241,163 @@ double cardavg(double price[], int& size, int maxsize) {
     return temptotal / size;
 
 }
+
+// now using struct
+void fillcollectiondata(CardCollection& collection) {
+    collection.tcg = getStringInput("What Trading Card Game do you collect? ");
+    collection.favoriteCard = getStringInput("What is your favorite card? ");
+    collection.years = getInt("How many years have you been collecting the TCG? ");
+    collection.totalCards = getInt("How many cards do you own? ");
+    collection.cardValue = getDouble("What is the average value of your cards? ");
+
+    collection.rarity = getrarity(); 
+
+
+    collection.totalValue = collection.totalCards * collection.cardValue;
+    if (collection.years > 0) {
+        collection.cardsPerYear = collection.totalCards / collection.years;
+    } else {
+        collection.cardsPerYear = collection.totalCards;
+    }
+
+    // if/else block giving comments on the value of the user's collection
+    if (collection.totalCards >= 500 && collection.totalValue >= 1000) {
+        std::cout << "\nHuge collection with high value.\n";
+    } else if (collection.totalCards <= 500 && collection.totalValue >= 1000) {
+        std::cout << "\nQaulity over qauntity\n";
+    } else {
+        std::cout << "\nWe all start somewhere.\n";
+    }
+
+    printcollectionsum(collection);
+    savecollectionsum(collection);
+
+}
+
+void printcollectionsum(const CardCollection& collection) {
+    std::cout << "\n********************************************\n";
+    std::cout << "           Your Collection Report           \n";
+    std::cout << "********************************************\n";
+    std::cout << std::left << std::setw(28) << "TCG:" << collection.tcg << "\n";
+    std::cout << std::left << std::setw(28) << "Favorite Card:" << collection.favoriteCard << "\n";
+    std::cout << std::left << std::setw(28) << "Main Rarity Tier:" << collection.rarity << "\n";
+    std::cout << "--------------------------------------------\n";
+    std::cout << std::left << std::setw(28) << "Years Collecting:" << collection.years << " yrs\n";
+    std::cout << std::left << std::setw(28) << "Total Cards:" << collection.totalCards << " cards\n";
+    std::cout << std::fixed << std::setprecision(2);
+    std::cout << std::left << std::setw(28) << "Avg Card Value:" << "$" << collection.cardValue << "\n";
+    std::cout << "--------------------------------------------\n";
+    std::cout << std::left << std::setw(28) << "Total Value:" << "$" << collection.totalValue << "\n";
+    std::cout << std::left << std::setw(28) << "Cards Per Year:" << collection.cardsPerYear << " cards/yr\n";
+    std::cout << "********************************************\n";
+}
+
+void savecollectionsum(const CardCollection& collection) {
+    std::ofstream outFile("report.txt");
+    outFile << "********************************************\n";
+    outFile << "           Your Collection Report           \n";
+    outFile << "********************************************\n";
+    outFile << std::left << std::setw(28) << "TCG:" << collection.tcg << "\n";
+    outFile << std::left << std::setw(28) << "Favorite Card:" << collection.favoriteCard << "\n";
+    outFile << std::left << std::setw(28) << "Main Rarity Tier:" << collection.rarity << "\n"; 
+    outFile << "--------------------------------------------\n";
+    outFile << std::left << std::setw(28) << "Years Collecting:" << collection.years << " yrs\n";
+    outFile << std::left << std::setw(28) << "Total Cards:" << collection.totalCards << " cards\n";
+    outFile << std::fixed << std::setprecision(2);
+    outFile << std::left << std::setw(28) << "Avg Card Value:" << "$" << collection.cardValue << "\n";
+    outFile << "--------------------------------------------\n";
+    outFile << std::left << std::setw(28) << "Total Value:" << "$" << collection.totalValue << "\n";
+    outFile << std::left << std::setw(28) << "Cards Per Year:" << collection.cardsPerYear << " cards/yr\n";
+    outFile << "********************************************\n";
+    outFile.close();
+}
+void displaycollection(const CardCollection collections[], int size) {
+    double sumvalue = 0;
+    int sumcards = 0;
+
+
+    std::cout << "\n********************************************\n";
+    std::cout << "         Total Collection Report           \n";
+    std::cout << "********************************************\n";
+
+    for (int i = 0; i < size; i++) { // displayed each user created collection
+        std::cout << "- " << collections[i].tcg << " (" << collections[i].totalCards << "cards valued at : $" << collections[i].totalValue << ")\n";
+        sumvalue += collections[i].totalValue;
+        sumcards += collections[i].totalCards; // talies up all stored array values for cards # and $
+
+    }
+
+    std::cout << "\n********************************************\n";
+    std::cout << "Grand total of Cards: " << sumcards << "\n";
+    std::cout << "Grand Worth: $" << sumvalue << "\n";
+
+    std::cout << "\n********************************************\n";
+    std::cout << "         Collector Recommendation           \n";
+    std::cout << "********************************************\n";
+
+    if (sumcards >= 400) {
+        std::cout << "High level collector- Start vending at card shows\n";
+    }
+    else if (sumcards >= 200) {
+        std::cout << "Medium Level collector- Start focusing on cards you like instead of value\n";
+    }
+    else {
+        std::cout << "Low level collector- pick out a TCG and start collecting\n";
+    }
+    std::cout << "********************************************\n";
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*double calculateTotalValue(int totalCards, double cardValue) {
+    return totalCards * cardValue;
+} */
+
+/*int calculateCardsPerYear(int totalCards, int years) {
+    if (years > 0) {
+        return totalCards / years;
+    }
+    return totalCards;
+} */
+
+// Saves the collection report to a text file
+/*void Report(std::string tcg, std::string favoriteCard, int years, int totalCards, double cardValue, double totalValue, int cardsPerYear, std::string rarity) {
+    std::ofstream outFile("report.txt");
+    outFile << "********************************************\n";
+    outFile << "           Your Collection Report           \n";
+    outFile << "********************************************\n";
+    outFile << std::left << std::setw(28) << "TCG:"           << tcg          << "\n";
+    outFile << std::left << std::setw(28) << "Favorite Card:" << favoriteCard << "\n";
+    outFile << std::left << std::setw(28) << "Main Rarity Tier:" << rarity << "\n"; //@ also update this
+    outFile << "--------------------------------------------\n";
+    outFile << std::left << std::setw(28) << "Years Collecting:"  << years      << " yrs\n";
+    outFile << std::left << std::setw(28) << "Total Cards:"       << totalCards << " cards\n";
+    outFile << std::fixed << std::setprecision(2);
+    outFile << std::left << std::setw(28) << "Avg Card Value:"    << "$" << cardValue << "\n";
+    outFile << "--------------------------------------------\n";
+    outFile << std::left << std::setw(28) << "Total Value:"       << "$" << totalValue << "\n";
+    outFile << std::left << std::setw(28) << "Cards Per Year:"    << cardsPerYear << " cards/yr\n";
+    outFile << "********************************************\n";
+    outFile.close();
+} */
